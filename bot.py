@@ -1,24 +1,27 @@
-#!/bin/bash
 import asyncio
-import logging
-import os
+from os import getenv
+
 from aiogram import Bot, Dispatcher
-from aiogram.client.bot import DefaultBotProperties
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.filters import Command
+from aiogram.types import Message
 
-from handlers import router
+TOKEN = getenv("BOT_TOKEN")
+
+dp = Dispatcher()
 
 
-async def main():
-    bot = Bot(token=os.environ.get("TOKEN"), default=DefaultBotProperties(
-        parse_mode=ParseMode.HTML))
-    dp = Dispatcher(storage=MemoryStorage())
-    dp.include_router(router)
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+# Command handler
+@dp.message(Command("start"))
+async def command_start_handler(message: Message) -> None:
+    await message.answer("Hello! I'm a bot created with aiogram.")
+
+
+# Run the bot
+async def main() -> None:
+    bot = Bot(token=TOKEN)
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     asyncio.run(main())
+          
